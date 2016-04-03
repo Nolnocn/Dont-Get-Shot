@@ -1,2 +1,3 @@
-# Dont-Get-Shot
-A simple web game I created for fun
+# Don't Get Shot C++
+
+This is the source code for the original version of Don't Get Shot, programmed in C++ and using OpenGL for rendering. I created it as my final project for my Data Structures and Algorithms course. It was the first time I attempted to create a game using C++ and I programmed the entire game in about a week. There's a lot that could have been improved, but we all have to start somewhere.
