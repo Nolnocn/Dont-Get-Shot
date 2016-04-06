@@ -4,7 +4,7 @@ Don't Get Shot was essentially the project that I worked on to learn both C++ an
 
 ## About this Project
 
-**Originally Created:** May, 2014
+**Originally Created:** May 2014
 
 **Project Duration:** 1 Week (C++ version)
 
