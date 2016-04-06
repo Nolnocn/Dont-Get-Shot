@@ -19,6 +19,7 @@ game.Phalanx = function() {
         this.active = true;
         this.onscreen = false;
         this.scoreVal = 5;
+        this.turnSpeed = 1.5;
     }
     
     var p = Phalanx.prototype;
@@ -29,7 +30,8 @@ game.Phalanx = function() {
         this.move(dt);
         if(this.isLeader) {
             if(this.player.alive) {
-                this.rotateToPlayer();
+                //this.rotateToPlayer();
+                this.turnTowardsPlayer(dt);
             }
         }
         else {
@@ -51,6 +53,19 @@ game.Phalanx = function() {
     
     p.rotateToLeader = function() {
         this.rot = this.utils.calcAngle(this.x, this.y, this.leader.x, this.leader.y);
+    };
+    
+    p.turnTowardsPlayer = function(dt) {
+        var desiredAngle = this.utils.calcAngle(this.x, this.y, this.player.x, this.player.y);
+        this.rot = this.constrainAngle(this.rot + this.turnSpeed * dt * this.constrainAngle(desiredAngle - this.rot));
+    };
+    
+    p.constrainAngle = function(angle) {
+	   angle = (angle + Math.PI)  % (Math.PI * 2);
+	   if (angle < 0) {
+           angle += Math.PI * 2;
+       }
+        return angle - Math.PI;
     };
     
     p.collidingWithPlayer = function() {

@@ -15,18 +15,6 @@ game.IMAGES = {
     phalanxImg: "images/phalanx.png"
 };
 
-game.KEYBOARD = {
-    "KEY_LEFT": 37,
-    "KEY_UP": 38,
-    "KEY_RIGHT": 39,
-    "KEY_DOWN": 40,
-    "KEY_SPACE": 32,
-    "P": 80
-};
-
-// Key Daemon
-game.keydown = {};
-
 // Mouse
 game.mouse = {
     x: 0,
@@ -41,8 +29,6 @@ game.loadImages = function() {
         var image = new Image();
         image.onload = function() {
             loadedImages++;
-            console.log(image);
-            console.log(loadedImages);
             if(loadedImages == imageCount) {
                 game.init();
             }
@@ -175,19 +161,22 @@ window.onload = function() {
     });
     
     canvas.addEventListener('mouseup', function(e) {
-        game.mouse.down = false; 
+        game.mouse.down = false;
     });
 
     canvas.addEventListener('mousemove', function(e) {
-        game.mouse.x = e.clientX - canvas.offsetLeft, canvas.width;
-        game.mouse.y = e.clientY - canvas.offsetTop, canvas.height;
+        game.mouse.x = e.pageX - canvas.offsetLeft, canvas.width;
+        game.mouse.y = e.pageY - canvas.offsetTop, canvas.height;
     });
     
-    /*canvas.addEventListener('mouseout', function(e) {
-        game.main.paused = true;
-    });*/
+    canvas.addEventListener('mouseout', function(e) {
+        if(!game.main.paused) {
+            game.main.togglePause();
+        }
+    });
 
     canvas.addEventListener('touchstart', function(e){
+        e.preventDefault();
         var touch = e.touches[0];
         game.mouse.x = Math.max(0, Math.min(touch.pageX - canvas.offsetLeft, canvas.width));
         game.mouse.y = Math.max(0, Math.min(touch.pageY - canvas.offsetTop, canvas.height));
@@ -202,19 +191,22 @@ window.onload = function() {
     });
     
     canvas.addEventListener('touchend', function(e){
+        e.preventDefault();
         game.main.doTouchEnd();
     });
     
-    //if(typeof window.orientation !== 'undefined'){...}
-    
-    window.addEventListener("keydown", function(e) {
-        game.keydown[e.keyCode] = true;
-    });
-    
-    window.addEventListener("keyup", function(e) {
-        game.keydown[e.keyCode] = false;
-        if(e.keyCode = game.KEYBOARD.P) {
-            game.main.togglePause();
-        }
+    canvas.addEventListener('touchcancel', function(e){
+        e.preventDefault();
+        game.main.doTouchEnd();
     });
 }
+
+var requestAnimationFrame =
+    window.requestAnimationFrame || 
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function(callback) { //Fallback function
+        window.setTimeout(callback, 1000/60);
+    };

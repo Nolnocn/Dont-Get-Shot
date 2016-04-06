@@ -31,7 +31,7 @@ game.drawLib = {
     
     text: function(ctx, string, x, y, size, col) {
         ctx.save();
-        ctx.font = size + 'px PressStart2P';
+        ctx.font = size + "px PressStart2P";
         ctx.fillStyle = col;
         ctx.fillText(string, x, y);
         ctx.restore();

@@ -27,8 +27,17 @@ game.main = {
         this.canvas = document.querySelector('canvas');
         this.ctx = this.canvas.getContext('2d');
         
-        if(typeof(window.localStorage) != 'undefined'){ 
-			this.highScore = window.localStorage.getItem ("highScore"); 
+        if(typeof(window.localStorage) != 'undefined'){
+            var val = window.localStorage.getItem ("highScore");
+            if(val) {
+                this.highScore = parseInt(val);
+            }
+            else {
+                this.highScore = 0;
+            }
+        }
+        else {
+            this.highScore = 0;
         }
         
         this.canvas.width = window.innerWidth
@@ -48,7 +57,7 @@ game.main = {
     
     update: function() {
         // Loop
-		requestAnimationFrame(this.update.bind(this));
+        requestAnimationFrame(this.update.bind(this));
         
         // Calculate dt
         var dt = (Date.now() - this.prevTime) * 0.001;
@@ -56,8 +65,10 @@ game.main = {
         
         // Update
         if(!this.paused && this.start) {
-            this.player.update(dt);
-            this.spawnEnemies(dt);
+            if(this.player.alive) {
+                this.player.update(dt);
+                this.spawnEnemies(dt);
+            }
             
             this.enemies.forEach(function(enemy) {
                 enemy.update(dt);
@@ -138,13 +149,13 @@ game.main = {
         var size = this.canvas.height / 20;
         if(!this.start) {
             this.drawLib.text(this.ctx, "Don't Get Shot", this.canvas.width*0.5, this.canvas.height*0.5-size, size+5, 'white');
-            this.drawLib.text(this.ctx, "<Click to Begin>", this.canvas.width*0.5, this.canvas.height*0.5+2*size, size, 'white');
+            this.drawLib.text(this.ctx, "<Press to Begin>", this.canvas.width*0.5, this.canvas.height*0.5+2*size, size, 'white');
         }
         if(!this.player.alive) {
             this.drawLib.text(this.ctx, "You Got Shot", this.canvas.width*0.5, this.canvas.height*0.5-(size+10), size + 5, 'white');
             this.drawLib.text(this.ctx, "High Score: " + this.highScore, this.canvas.width*0.5, this.canvas.height*0.5, size, 'white');
             this.drawLib.text(this.ctx, "Your Score: " + this.score, this.canvas.width*0.5, this.canvas.height*0.5+size+5, size, 'white');
-            this.drawLib.text(this.ctx, "<Click to Retry>", this.canvas.width*0.5, this.canvas.height*0.5+size*2+5, size-10, 'white');
+            this.drawLib.text(this.ctx, "<Press to Retry>", this.canvas.width*0.5, this.canvas.height*0.5+size*2+5, size-size*.2, 'white');
         }
         else {
             if(this.paused) {
@@ -179,7 +190,9 @@ game.main = {
     },
     
     togglePause: function() {
-        this.paused = !this.paused;
+        if(this.start && this.player.alive) {
+            this.paused = !this.paused;
+        }
     },
     
     spawnPhalanx: function(x, y, num) {
@@ -211,9 +224,7 @@ game.main = {
         }
         else {
             if(this.player.alive) {
-                if(this.paused) {
-                    this.togglePause();
-                }
+                this.paused = false;
             }
             else {
                 this.reset();
@@ -223,7 +234,7 @@ game.main = {
     
     doTouchEnd: function() {
         if(!this.paused && this.player.alive && this.start) {
-            this.togglePause();
+            this.paused = true;
         }
     },
     
@@ -280,14 +291,14 @@ game.main = {
         }
         
         var val = Math.floor(this.score / 100) + 3;
-        if(Math.round(this.score / 100) + 3 > this.maxEnemies) {
+        if(val > this.maxEnemies) {
             this.maxEnemies = val;
         }
         
         val = Math.floor(this.score / (1000 * (this.phalanxSpawn+1)));
         if(val > this.phalanxSpawn) {
             this.phalanxSpawn = val;
-            this.spawnPhalanx(-50, this.canvas.height * 0.5, this.phalanxSpawn * 50);
+            this.spawnPhalanx(-50, this.canvas.height * 0.5, this.phalanxSpawn * 100);
         }
     },
     
@@ -306,6 +317,7 @@ game.main = {
         this.player.init(this.canvas.width * 0.5, this.canvas.height * 0.5);
         this.score = 0;
         this.phalanxSpawn = 0;
+        this.phalanxCount = 0;
         this.maxEnemies = 3;
         this.spawnTime = this.spawnDelay;
         this.enemies = [];
